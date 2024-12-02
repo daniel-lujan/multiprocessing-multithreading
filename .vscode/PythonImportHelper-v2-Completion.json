@@ -35,6 +35,14 @@
         "documentation": {}
     },
     {
+        "label": "listdir",
+        "importPath": "os",
+        "description": "os",
+        "isExtraImport": true,
+        "detail": "os",
+        "documentation": {}
+    },
+    {
         "label": "shutil",
         "kind": 6,
         "isExtraImport": true,
@@ -116,6 +124,38 @@
         "documentation": {}
     },
     {
+        "label": "Manager",
+        "importPath": "multiprocessing",
+        "description": "multiprocessing",
+        "isExtraImport": true,
+        "detail": "multiprocessing",
+        "documentation": {}
+    },
+    {
+        "label": "Pool",
+        "importPath": "multiprocessing",
+        "description": "multiprocessing",
+        "isExtraImport": true,
+        "detail": "multiprocessing",
+        "documentation": {}
+    },
+    {
+        "label": "isfile",
+        "importPath": "os.path",
+        "description": "os.path",
+        "isExtraImport": true,
+        "detail": "os.path",
+        "documentation": {}
+    },
+    {
+        "label": "join",
+        "importPath": "os.path",
+        "description": "os.path",
+        "isExtraImport": true,
+        "detail": "os.path",
+        "documentation": {}
+    },
+    {
         "label": "isfile",
         "importPath": "os.path",
         "description": "os.path",
@@ -140,11 +180,19 @@
         "documentation": {}
     },
     {
-        "label": "Thread",
-        "importPath": "threading",
-        "description": "threading",
+        "label": "randint",
+        "importPath": "random",
+        "description": "random",
         "isExtraImport": true,
-        "detail": "threading",
+        "detail": "random",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "importPath": "time",
+        "description": "time",
+        "isExtraImport": true,
+        "detail": "time",
         "documentation": {}
     },
     {
@@ -179,6 +227,22 @@
         "description": "bcolors",
         "isExtraImport": true,
         "detail": "bcolors",
+        "documentation": {}
+    },
+    {
+        "label": "bcolors",
+        "importPath": "bcolors",
+        "description": "bcolors",
+        "isExtraImport": true,
+        "detail": "bcolors",
+        "documentation": {}
+    },
+    {
+        "label": "Thread",
+        "importPath": "threading",
+        "description": "threading",
+        "isExtraImport": true,
+        "detail": "threading",
         "documentation": {}
     },
     {
@@ -445,73 +509,181 @@
     {
         "label": "get_random_line_from_file",
         "kind": 2,
-        "importPath": "multithreading",
-        "description": "multithreading",
+        "importPath": "test_multiprocessing",
+        "description": "test_multiprocessing",
         "peekOfCode": "def get_random_line_from_file(file_name: str):\n    with open(file_name, \"r\") as file:\n        # file_name is formatted as 'file_{file_number}_{number_of_lines}.txt'\n        _, file_number, lines = file_name.split(\"_\")\n        lines = int(lines.split(\".\")[0])\n        random_line = randint(0, lines - 1)\n        for i, line in enumerate(file):\n            if i == random_line:\n                return line, file_number, lines\ndef generate_target_values() -> pd.DataFrame:",
-        "detail": "multithreading",
+        "detail": "test_multiprocessing",
         "documentation": {}
     },
     {
         "label": "generate_target_values",
         "kind": 2,
-        "importPath": "multithreading",
-        "description": "multithreading",
-        "peekOfCode": "def generate_target_values() -> pd.DataFrame:\n    target_values = pd.DataFrame(\n        columns=[\"File Group\", \"Lines\", \"Value\", \"Source Filename\"]\n    )\n    processed_groups = set()\n    for filename in listdir(data_directory):\n        if isfile(join(data_directory, filename)):\n            match = re.match(r\"file_(\\d+)_\\d+\\.csv\", filename)\n            if match:\n                file_group = match.group(1)",
-        "detail": "multithreading",
+        "importPath": "test_multiprocessing",
+        "description": "test_multiprocessing",
+        "peekOfCode": "def generate_target_values() -> pd.DataFrame:\n    target_values = pd.DataFrame.from_dict(\n        {\"File Group\": file_sizes, \"Value\": [None] * len(file_sizes)}\n    )\n    data_files = listdir(data_directory)\n    for size in target_values[\"File Group\"]:\n        current_files = [file for file in data_files if f\"_{size}.csv\" in file]\n        random_file = current_files[randint(0, len(current_files) - 1)]\n        id_, file_number, lines = get_random_line_from_file(\n            join(data_directory, random_file)",
+        "detail": "test_multiprocessing",
         "documentation": {}
     },
     {
         "label": "search_for_value",
         "kind": 2,
-        "importPath": "multithreading",
-        "description": "multithreading",
-        "peekOfCode": "def search_for_value(file_name, value, results):\n    start = time()\n    with open(file_name, \"r\") as file:\n        for i, line in enumerate(file):\n            if line.strip() == value:\n                test_time = time() - start\n                results.append(test_time)\ndef run_search_parallel(targets: pd.DataFrame):\n    threads = []\n    results = []",
-        "detail": "multithreading",
+        "importPath": "test_multiprocessing",
+        "description": "test_multiprocessing",
+        "peekOfCode": "def search_for_value(args):\n    file_name, value = args\n    start = time()\n    with open(file_name, \"r\") as file:\n        for i, line in enumerate(file):\n            if line.strip() == value:\n                return time() - start, True\n    return time() - start, False\ndef run_search_parallel(value: str, files: list[str]):\n    with Pool(processes=len(files)) as pool:",
+        "detail": "test_multiprocessing",
         "documentation": {}
     },
     {
         "label": "run_search_parallel",
         "kind": 2,
-        "importPath": "multithreading",
-        "description": "multithreading",
-        "peekOfCode": "def run_search_parallel(targets: pd.DataFrame):\n    threads = []\n    results = []\n    for args in targets.values:\n        thread = Thread(target=search_for_value, args=(args[3], args[2], results))\n        threads.append(thread)\n        thread.start()\n    for thread in threads:\n        thread.join()\n    return results",
-        "detail": "multithreading",
+        "importPath": "test_multiprocessing",
+        "description": "test_multiprocessing",
+        "peekOfCode": "def run_search_parallel(value: str, files: list[str]):\n    with Pool(processes=len(files)) as pool:\n        results = pool.map(search_for_value, [(file, value) for file in files])\n    return results\ndef run_tests():\n    results = pd.DataFrame(columns=[\"File Count\", \"Size\", \"Avg. Time\"])\n    for _ in range(RANDOM_TESTS):\n        print(f\"{b.OKGREEN}Test {_ + 1}/{RANDOM_TESTS}\", end=\"\")\n        target_values = generate_target_values()\n        test_results = pd.DataFrame(columns=[\"File Count\", \"Size\", \"Avg. Time\"])",
+        "detail": "test_multiprocessing",
         "documentation": {}
     },
     {
         "label": "run_tests",
         "kind": 2,
-        "importPath": "multithreading",
-        "description": "multithreading",
-        "peekOfCode": "def run_tests():\n    results = pd.DataFrame(columns=[\"Size\", \"Avg. Time\"])\n    for _ in range(RANDOM_TESTS):\n        print(f\"{b.OKGREEN}Test {_ + 1}/{RANDOM_TESTS}\", end=\"\")\n        target_values = generate_target_values()\n        sizes = target_values[\"Lines\"].unique()\n        test_results = pd.DataFrame(columns=[\"Size\", \"Avg. Time\"])\n        for size in sizes:\n            targets = target_values.where(target_values[\"Lines\"] == size).dropna()\n            size_result = run_search_parallel(targets)",
-        "detail": "multithreading",
+        "importPath": "test_multiprocessing",
+        "description": "test_multiprocessing",
+        "peekOfCode": "def run_tests():\n    results = pd.DataFrame(columns=[\"File Count\", \"Size\", \"Avg. Time\"])\n    for _ in range(RANDOM_TESTS):\n        print(f\"{b.OKGREEN}Test {_ + 1}/{RANDOM_TESTS}\", end=\"\")\n        target_values = generate_target_values()\n        test_results = pd.DataFrame(columns=[\"File Count\", \"Size\", \"Avg. Time\"])\n        for size in file_sizes:\n            target = target_values[target_values[\"File Group\"] == size][\"Value\"].values[\n                0\n            ]",
+        "detail": "test_multiprocessing",
         "documentation": {}
     },
     {
         "label": "main",
         "kind": 2,
-        "importPath": "multithreading",
-        "description": "multithreading",
-        "peekOfCode": "def main():\n    print(f\"{b.HEADER}Ejecutando test con Multithreading...{b.ENDC}\")\n    results = run_tests()\n    results.to_csv(\"results-multithreading.csv\", index=False)\n    print(\n        f\"Test finalizado. Resultados guardados en {b.UNDERLINE}'results-multithreading.csv'{b.ENDC}\"\n    )\nif __name__ == \"__main__\":\n    main()",
-        "detail": "multithreading",
+        "importPath": "test_multiprocessing",
+        "description": "test_multiprocessing",
+        "peekOfCode": "def main():\n    print(f\"{b.HEADER}Ejecutando test con Multiprocessing...{b.ENDC}\")\n    results = run_tests()\n    results.to_csv(\"results-multiprocessing.csv\", index=False)\n    print(\n        f\"Test finalizado. Resultados guardados en {b.UNDERLINE}'results-multiprocessing.csv'{b.ENDC}\"\n    )\nif __name__ == \"__main__\":\n    main()",
+        "detail": "test_multiprocessing",
         "documentation": {}
     },
     {
         "label": "data_directory",
         "kind": 5,
-        "importPath": "multithreading",
-        "description": "multithreading",
-        "peekOfCode": "data_directory = \"./data/\"\nRANDOM_TESTS = 2\ndef get_random_line_from_file(file_name: str):\n    with open(file_name, \"r\") as file:\n        # file_name is formatted as 'file_{file_number}_{number_of_lines}.txt'\n        _, file_number, lines = file_name.split(\"_\")\n        lines = int(lines.split(\".\")[0])\n        random_line = randint(0, lines - 1)\n        for i, line in enumerate(file):\n            if i == random_line:",
-        "detail": "multithreading",
+        "importPath": "test_multiprocessing",
+        "description": "test_multiprocessing",
+        "peekOfCode": "data_directory = \"./data/\"\nRANDOM_TESTS = 8\nfile_sizes = set()\nfor file in listdir(data_directory):\n    if isfile(join(data_directory, file)):\n        file_sizes.add(\n            int(\n                re.search(r\"_\\d+.csv\", file)\n                .group(0)\n                .replace(\".csv\", \"\")",
+        "detail": "test_multiprocessing",
         "documentation": {}
     },
     {
         "label": "RANDOM_TESTS",
         "kind": 5,
-        "importPath": "multithreading",
-        "description": "multithreading",
-        "peekOfCode": "RANDOM_TESTS = 2\ndef get_random_line_from_file(file_name: str):\n    with open(file_name, \"r\") as file:\n        # file_name is formatted as 'file_{file_number}_{number_of_lines}.txt'\n        _, file_number, lines = file_name.split(\"_\")\n        lines = int(lines.split(\".\")[0])\n        random_line = randint(0, lines - 1)\n        for i, line in enumerate(file):\n            if i == random_line:\n                return line, file_number, lines",
-        "detail": "multithreading",
+        "importPath": "test_multiprocessing",
+        "description": "test_multiprocessing",
+        "peekOfCode": "RANDOM_TESTS = 8\nfile_sizes = set()\nfor file in listdir(data_directory):\n    if isfile(join(data_directory, file)):\n        file_sizes.add(\n            int(\n                re.search(r\"_\\d+.csv\", file)\n                .group(0)\n                .replace(\".csv\", \"\")\n                .replace(\"_\", \"\")",
+        "detail": "test_multiprocessing",
+        "documentation": {}
+    },
+    {
+        "label": "file_sizes",
+        "kind": 5,
+        "importPath": "test_multiprocessing",
+        "description": "test_multiprocessing",
+        "peekOfCode": "file_sizes = set()\nfor file in listdir(data_directory):\n    if isfile(join(data_directory, file)):\n        file_sizes.add(\n            int(\n                re.search(r\"_\\d+.csv\", file)\n                .group(0)\n                .replace(\".csv\", \"\")\n                .replace(\"_\", \"\")\n            )",
+        "detail": "test_multiprocessing",
+        "documentation": {}
+    },
+    {
+        "label": "file_sizes",
+        "kind": 5,
+        "importPath": "test_multiprocessing",
+        "description": "test_multiprocessing",
+        "peekOfCode": "file_sizes = sorted(list(file_sizes))\nif __name__ == \"__main__\":\n    print(f\"{b.OKBLUE}File sizes found: {file_sizes}{b.ENDC}\")\ndef get_random_line_from_file(file_name: str):\n    with open(file_name, \"r\") as file:\n        # file_name is formatted as 'file_{file_number}_{number_of_lines}.txt'\n        _, file_number, lines = file_name.split(\"_\")\n        lines = int(lines.split(\".\")[0])\n        random_line = randint(0, lines - 1)\n        for i, line in enumerate(file):",
+        "detail": "test_multiprocessing",
+        "documentation": {}
+    },
+    {
+        "label": "get_random_line_from_file",
+        "kind": 2,
+        "importPath": "test_multithreading",
+        "description": "test_multithreading",
+        "peekOfCode": "def get_random_line_from_file(file_name: str):\n    with open(file_name, \"r\") as file:\n        # file_name is formatted as 'file_{file_number}_{number_of_lines}.txt'\n        _, file_number, lines = file_name.split(\"_\")\n        lines = int(lines.split(\".\")[0])\n        random_line = randint(0, lines - 1)\n        for i, line in enumerate(file):\n            if i == random_line:\n                return line, file_number, lines\ndef generate_target_values() -> pd.DataFrame:",
+        "detail": "test_multithreading",
+        "documentation": {}
+    },
+    {
+        "label": "generate_target_values",
+        "kind": 2,
+        "importPath": "test_multithreading",
+        "description": "test_multithreading",
+        "peekOfCode": "def generate_target_values() -> pd.DataFrame:\n    target_values = pd.DataFrame.from_dict(\n        {\"File Group\": file_sizes, \"Value\": [None] * len(file_sizes)}\n    )\n    data_files = listdir(data_directory)\n    for size in target_values[\"File Group\"]:\n        current_files = [file for file in data_files if f\"_{size}.csv\" in file]\n        random_file = current_files[randint(0, len(current_files) - 1)]\n        id_, file_number, lines = get_random_line_from_file(\n            join(data_directory, random_file)",
+        "detail": "test_multithreading",
+        "documentation": {}
+    },
+    {
+        "label": "search_for_value",
+        "kind": 2,
+        "importPath": "test_multithreading",
+        "description": "test_multithreading",
+        "peekOfCode": "def search_for_value(file_name, value, results):\n    start = time()\n    with open(file_name, \"r\") as file:\n        for i, line in enumerate(file):\n            if results[\"found\"]:\n                # print(\"Early abort. Value found in another worker.\")\n                break\n            if line.strip() == value:\n                # print(\n                #     f\"{b.OKGREEN}Finishing worker. Value found in {file_name} at line {i + 1}{b.ENDC}\"",
+        "detail": "test_multithreading",
+        "documentation": {}
+    },
+    {
+        "label": "run_search_parallel",
+        "kind": 2,
+        "importPath": "test_multithreading",
+        "description": "test_multithreading",
+        "peekOfCode": "def run_search_parallel(value: str, files: list[str]):\n    threads = []\n    results = {\n        \"time\": -1,\n        \"found\": False,\n    }\n    for file in files:\n        thread = Thread(target=search_for_value, args=(file, value, results))\n        threads.append(thread)\n        thread.start()",
+        "detail": "test_multithreading",
+        "documentation": {}
+    },
+    {
+        "label": "run_tests",
+        "kind": 2,
+        "importPath": "test_multithreading",
+        "description": "test_multithreading",
+        "peekOfCode": "def run_tests():\n    results = pd.DataFrame(columns=[\"File Count\", \"Size\", \"Avg. Time\"])\n    for _ in range(RANDOM_TESTS):\n        print(f\"{b.OKGREEN}Test {_ + 1}/{RANDOM_TESTS}\", end=\"\")\n        target_values = generate_target_values()\n        test_results = pd.DataFrame(columns=[\"File Count\", \"Size\", \"Avg. Time\"])\n        for size in file_sizes:\n            target = target_values[target_values[\"File Group\"] == size][\"Value\"].values[\n                0\n            ]",
+        "detail": "test_multithreading",
+        "documentation": {}
+    },
+    {
+        "label": "main",
+        "kind": 2,
+        "importPath": "test_multithreading",
+        "description": "test_multithreading",
+        "peekOfCode": "def main():\n    print(f\"{b.HEADER}Ejecutando test con Multithreading...{b.ENDC}\")\n    results = run_tests()\n    results.to_csv(\"results-multithreading.csv\", index=False)\n    print(\n        f\"Test finalizado. Resultados guardados en {b.UNDERLINE}'results-multithreading.csv'{b.ENDC}\"\n    )\nif __name__ == \"__main__\":\n    main()",
+        "detail": "test_multithreading",
+        "documentation": {}
+    },
+    {
+        "label": "data_directory",
+        "kind": 5,
+        "importPath": "test_multithreading",
+        "description": "test_multithreading",
+        "peekOfCode": "data_directory = \"./data/\"\nRANDOM_TESTS = 8\nfile_sizes = set()\nfor file in listdir(data_directory):\n    if isfile(join(data_directory, file)):\n        file_sizes.add(\n            int(\n                re.search(r\"_\\d+.csv\", file)\n                .group(0)\n                .replace(\".csv\", \"\")",
+        "detail": "test_multithreading",
+        "documentation": {}
+    },
+    {
+        "label": "RANDOM_TESTS",
+        "kind": 5,
+        "importPath": "test_multithreading",
+        "description": "test_multithreading",
+        "peekOfCode": "RANDOM_TESTS = 8\nfile_sizes = set()\nfor file in listdir(data_directory):\n    if isfile(join(data_directory, file)):\n        file_sizes.add(\n            int(\n                re.search(r\"_\\d+.csv\", file)\n                .group(0)\n                .replace(\".csv\", \"\")\n                .replace(\"_\", \"\")",
+        "detail": "test_multithreading",
+        "documentation": {}
+    },
+    {
+        "label": "file_sizes",
+        "kind": 5,
+        "importPath": "test_multithreading",
+        "description": "test_multithreading",
+        "peekOfCode": "file_sizes = set()\nfor file in listdir(data_directory):\n    if isfile(join(data_directory, file)):\n        file_sizes.add(\n            int(\n                re.search(r\"_\\d+.csv\", file)\n                .group(0)\n                .replace(\".csv\", \"\")\n                .replace(\"_\", \"\")\n            )",
+        "detail": "test_multithreading",
+        "documentation": {}
+    },
+    {
+        "label": "file_sizes",
+        "kind": 5,
+        "importPath": "test_multithreading",
+        "description": "test_multithreading",
+        "peekOfCode": "file_sizes = sorted(list(file_sizes))\nprint(f\"{b.OKBLUE}File sizes found: {file_sizes}{b.ENDC}\")\ndef get_random_line_from_file(file_name: str):\n    with open(file_name, \"r\") as file:\n        # file_name is formatted as 'file_{file_number}_{number_of_lines}.txt'\n        _, file_number, lines = file_name.split(\"_\")\n        lines = int(lines.split(\".\")[0])\n        random_line = randint(0, lines - 1)\n        for i, line in enumerate(file):\n            if i == random_line:",
+        "detail": "test_multithreading",
         "documentation": {}
     }
 ]
