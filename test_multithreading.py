@@ -1,12 +1,12 @@
 from threading import Thread
-from time import time
+from time import perf_counter
 
 from bcolors import bcolors as b
 from common import run_tests
 
 
 def search_for_value(file_name, value, results):
-    start = time()
+    start = perf_counter()
     with open(file_name, "r") as file:
         for i, line in enumerate(file):
             if results["found"]:
@@ -16,7 +16,7 @@ def search_for_value(file_name, value, results):
                 # print(
                 #     f"{b.OKGREEN}Finishing worker. Value found in {file_name} at line {i + 1}{b.ENDC}"
                 # )
-                results["time"] = time() - start
+                results["time"] = perf_counter() - start
                 results["found"] = True
                 break
 

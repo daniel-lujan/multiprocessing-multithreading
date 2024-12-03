@@ -1,5 +1,5 @@
 from multiprocessing import Pool
-from time import time
+from time import perf_counter
 
 from bcolors import bcolors as b
 from common import run_tests
@@ -7,12 +7,12 @@ from common import run_tests
 
 def search_for_value(args):
     file_name, value = args
-    start = time()
+    start = perf_counter()
     with open(file_name, "r") as file:
         for i, line in enumerate(file):
             if line.strip() == value:
-                return time() - start, True
-    return time() - start, False
+                return perf_counter() - start, True
+    return perf_counter() - start, False
 
 
 def run_search_parallel(value: str, files: list[str]):

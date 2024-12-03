@@ -2,7 +2,7 @@ import re
 from os import listdir
 from os.path import isfile, join
 from random import randint
-from time import time
+from time import perf_counter
 from typing import Callable
 
 import pandas as pd
@@ -84,13 +84,13 @@ def run_tests(run_search_parallel: Callable):
                 for f in listdir(data_directory)
                 if f"_{size}.csv" in f
             ]
-            start_time = time()
+            start_time = perf_counter()
             size_result = run_search_parallel(
                 target,
                 files,
             )
 
-            end_time = time() - start_time
+            end_time = perf_counter() - start_time
 
             test_results = pd.concat(
                 [
