@@ -10,7 +10,8 @@ import pandas as pd
 from bcolors import bcolors as b
 
 data_directory = "./data/"
-RANDOM_TESTS = 2
+target_values_dir = "./temp/target_values/"
+RANDOM_TESTS = 40
 
 
 file_sizes = set()
@@ -68,15 +69,16 @@ def generate_target_values() -> pd.DataFrame:
 def run_tests(run_search_parallel: Callable):
     results = pd.DataFrame(columns=["File Count", "Size", "Avg. Time"])
 
-    for _ in range(RANDOM_TESTS):
-        print(f"{b.OKGREEN}Test {_ + 1}/{RANDOM_TESTS}", end="")
+    for i in range(RANDOM_TESTS):
+        print(f"{b.OKGREEN}Test {i + 1}/{RANDOM_TESTS}", end="")
         target_values = generate_target_values()
         test_results = pd.DataFrame(columns=["File Count", "Size", "Avg. Time"])
 
         for size in file_sizes:
-            target = target_values[target_values["File Group"] == size]["Value"].values[
-                0
-            ]
+            target = pd.read_csv(join(target_values_dir, f"target_values_{i}.csv"))[
+                target_values["File Group"] == size
+            ]["Value"].values[0]
+
             files = [
                 join(data_directory, f)
                 for f in listdir(data_directory)
@@ -101,12 +103,7 @@ def run_tests(run_search_parallel: Callable):
                 ignore_index=True,
             )
 
-        results = (
-            pd.concat([results, test_results], ignore_index=True)
-            .groupby("Size")
-            .mean()
-            .reset_index()
-        )
+        results = pd.concat([results, test_results], ignore_index=True)
 
         print(f" - COMPLETED{b.ENDC}")
 
